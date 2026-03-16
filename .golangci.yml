@@ -1,0 +1,20 @@
+version: "2"
+
+linters:
+  enable:
+    - loglint
+
+  settings:
+    custom:
+      loglint:
+        type: module
+        settings:
+          check-lowercase: true
+          check-english: true
+          check-specialchars: true
+          check-sensitive: true
+          sensitive-case: false
+          sensitive-keywords:
+            - password
+            - token
+            - secret
