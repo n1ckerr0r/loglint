@@ -37,9 +37,10 @@ sensitive-keywords:
 - password
 - token
 - secret
+suggested-fix: true
 ```
 
-Флаги отвечают за включение правила, sensitive-keywords задает список чувствительных слов, а с помощью sensitive-case можно указать будут ли чувствительные слова чувствительны к регистру
+Флаги отвечают за включение правила, sensitive-keywords задает список чувствительных слов, а с помощью sensitive-case можно указать будут ли чувствительные слова чувствительны к регистру. С помощью флага suggested-fix: true можно настроить подсказки.
 
 После настройки нужно собрать плагин c помощью команды
 ```bash
@@ -50,8 +51,13 @@ golangci-lint custom
 
 ```bash
 chmod u+x ./gcl-with-loglint
-./gcl-with-loglint run ./gcl-with-loglint run ./testdata
+./gcl-with-loglint run ./testdata
 ```
+
+# SuggestedFixes
+SuggestedFixes имеет смысл делать только для двух правил:
+- Lowercase (можно также вывести готовую строку)
+- Special_chars (не имеет смысла выводить готовую строку, но можно указать первый некорректный символ)
 
 ## Тесты
 Тесты разбросаны по проекту, поэтому для их запуска стандартная команда
