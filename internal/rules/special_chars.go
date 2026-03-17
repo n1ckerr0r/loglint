@@ -37,8 +37,8 @@ func (specialCharRule *SpecialCharsRule) Check(message log_message.LogMessage) (
 			Message: fmt.Sprintf("remove forbidden character %q", ch),
 			TextEdits: []analysis.TextEdit{
 				{
-					Pos: pos,
-					End: pos + token.Pos(len(string(ch))),
+					Pos:     pos,
+					End:     pos + token.Pos(len(string(ch))),
 					NewText: []byte(""),
 				},
 			},

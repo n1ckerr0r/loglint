@@ -35,8 +35,8 @@ func (lowercaseRule *LowercaseRule) Check(message log_message.LogMessage) (error
 			Message: "make message lowercase",
 			TextEdits: []analysis.TextEdit{
 				{
-					Pos: message.Pos,
-					End: message.Pos + token.Pos(len(message.Text)+2),
+					Pos:     message.Pos,
+					End:     message.Pos + token.Pos(len(message.Text)+2),
 					NewText: []byte(`"` + fixed + `"`),
 				},
 			},
