@@ -8,10 +8,10 @@ import (
 
 func TestExtractMessageFromArg(t *testing.T) {
 	tests := []struct {
-		name    string
-		arg     ast.Expr
-		want    string
-		wantOk  bool
+		name   string
+		arg    ast.Expr
+		want   string
+		wantOk bool
 	}{
 		{
 			name:   "простая строка",

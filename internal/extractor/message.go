@@ -86,8 +86,8 @@ func extractFromBinary(expr *ast.BinaryExpr) (string, bool) {
 
 func extractFromCall(call *ast.CallExpr) (string, bool) {
 
-	if sel, ok := call.Fun.(*ast.SelectorExpr); ok {
-		if pkg, ok := sel.X.(*ast.Ident); ok && pkg.Name == "fmt" && sel.Sel.Name == "Sprintf" {
+	if sel, ok1 := call.Fun.(*ast.SelectorExpr); ok1 {
+		if pkg, ok2 := sel.X.(*ast.Ident); ok2 && pkg.Name == "fmt" && sel.Sel.Name == "Sprintf" {
 			if len(call.Args) > 0 {
 				if format, ok := call.Args[0].(*ast.BasicLit); ok && format.Kind == token.STRING {
 					msg, _ := strconv.Unquote(format.Value)
