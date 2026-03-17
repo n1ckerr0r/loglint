@@ -18,3 +18,4 @@ linters:
             - password
             - token
             - secret
+          suggested-fix: true

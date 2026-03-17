@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/n1ckerr0r/loglint/internal/log_message"
+	"golang.org/x/tools/go/analysis"
 )
 
 // Позволяет пользователю настроить слайс чувствительных данных
@@ -48,7 +49,7 @@ func (r *SensitiveRule) Name() string {
 	return "sensitive"
 }
 
-func (sensitiveRule *SensitiveRule) Check(msg log_message.LogMessage) error {
+func (sensitiveRule *SensitiveRule) Check(msg log_message.LogMessage) (error, *analysis.SuggestedFix) {
 
 	text := msg.Text
 
@@ -65,9 +66,9 @@ func (sensitiveRule *SensitiveRule) Check(msg log_message.LogMessage) error {
 		}
 
 		if strings.Contains(text, keyword) {
-			return ErrSensitiveData
+			return ErrSensitiveData, nil
 		}
 	}
 
-	return nil
+	return nil, nil
 }

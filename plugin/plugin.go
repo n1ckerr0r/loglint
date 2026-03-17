@@ -17,6 +17,7 @@ type pluginSettings struct {
 	CheckEnglish      bool     `json:"check-english"`
 	CheckSpecialChars bool     `json:"check-specialchars"`
 	CheckSensitive    bool     `json:"check-sensitive"`
+	SuggestedFix      bool     `json:"suggested-fix"`
 	SensitiveCase     bool     `json:"sensitive-case"`
 	SensitiveKeywords []string `json:"sensitive-keywords"`
 }
@@ -34,12 +35,13 @@ func New(conf any) (register.LinterPlugin, error) {
 		return nil, err
 	}
 	cfg := config.Config{
-		EnableLowercase:   s.CheckLowercase,
-		EnableEnglish:     s.CheckEnglish,
-		EnableSpecial:     s.CheckSpecialChars,
-		EnableSensitive:   s.CheckSensitive,
-		CaseSensitive:     s.SensitiveCase,
-		SensitiveKeywords: s.SensitiveKeywords,
+		EnableLowercase:    s.CheckLowercase,
+		EnableEnglish:      s.CheckEnglish,
+		EnableSpecial:      s.CheckSpecialChars,
+		EnableSensitive:    s.CheckSensitive,
+		EnableSuggestedFix: s.SuggestedFix,
+		CaseSensitive:      s.SensitiveCase,
+		SensitiveKeywords:  s.SensitiveKeywords,
 	}
 	return &Plugin{cfg: cfg}, nil
 }
@@ -48,7 +50,7 @@ func (plugin *Plugin) BuildAnalyzers() ([]*analysis.Analyzer, error) {
 	ruleSet := rules.Build(plugin.cfg)
 
 	return []*analysis.Analyzer{
-		analyzer.New(ruleSet),
+		analyzer.New(ruleSet, plugin.cfg),
 	}, nil
 }
 

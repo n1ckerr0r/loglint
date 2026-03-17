@@ -1,10 +1,12 @@
 package analyzer
 
 import (
+	"fmt"
 	"go/ast"
 	"log"
 	"runtime/debug"
 
+	"github.com/n1ckerr0r/loglint/internal/config"
 	"github.com/n1ckerr0r/loglint/internal/detector"
 	"github.com/n1ckerr0r/loglint/internal/extractor"
 	"github.com/n1ckerr0r/loglint/internal/log_message"
@@ -13,7 +15,7 @@ import (
 	"golang.org/x/tools/go/analysis/passes/inspect"
 )
 
-func New(ruleSet []rules.Rule) *analysis.Analyzer {
+func New(ruleSet []rules.Rule, cfg config.Config) *analysis.Analyzer {
 	return &analysis.Analyzer{
 		Name: "loglint",
 		Doc:  "checks log messages",
@@ -21,12 +23,12 @@ func New(ruleSet []rules.Rule) *analysis.Analyzer {
 			inspect.Analyzer,
 		},
 		Run: func(pass *analysis.Pass) (interface{}, error) {
-			return run(pass, ruleSet)
+			return run(pass, ruleSet, cfg)
 		},
 	}
 }
 
-func run(pass *analysis.Pass, ruleSet []rules.Rule) (interface{}, error) {
+func run(pass *analysis.Pass, ruleSet []rules.Rule, cfg config.Config) (interface{}, error) {
 
 	if pass.TypesInfo == nil {
 		log.Println("no type info")
@@ -50,7 +52,7 @@ func run(pass *analysis.Pass, ruleSet []rules.Rule) (interface{}, error) {
 				return true
 			}
 
-			checkCall(pass, call, logDetector, &ruleSet)
+			checkCall(pass, call, logDetector, &ruleSet, cfg)
 
 			return true
 		})
@@ -64,6 +66,7 @@ func checkCall(
 	call *ast.CallExpr,
 	logDetector *detector.Detector,
 	ruleSet *[]rules.Rule,
+	cfg config.Config,
 ) {
 
 	// Лучше всего обрабатывать панику здесь, чтобы у пользователя было максимум информации и программа не падала
@@ -102,14 +105,30 @@ func checkCall(
 
 	for _, rule := range *ruleSet {
 
-		if err := rule.Check(*msg); err != nil {
+		err, fix := rule.Check(*msg)
 
-			pass.Reportf(
-				msg.Pos,
-				"%s: %v",
-				rule.Name(),
-				err,
-			)
+		if err != nil {
+
+			message := fmt.Sprintf("%s: %v", rule.Name(), err)
+
+			if cfg.EnableSuggestedFix && fix != nil {
+				message += fmt.Sprintf(" | fix: %s", fix.Message)
+
+				if len(fix.TextEdits) > 0 {
+					message += fmt.Sprintf(" : %s", string(fix.TextEdits[0].NewText))
+				}
+			}
+
+			diagnostic := analysis.Diagnostic{
+				Pos:     msg.Pos,
+				Message: message,
+			}
+
+			if fix != nil {
+				diagnostic.SuggestedFixes = []analysis.SuggestedFix{*fix}
+			}
+
+			pass.Report(diagnostic)
 		}
 	}
 }

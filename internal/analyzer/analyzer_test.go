@@ -3,6 +3,7 @@ package analyzer
 import (
 	"testing"
 
+	"github.com/n1ckerr0r/loglint/internal/config"
 	"github.com/n1ckerr0r/loglint/internal/rules"
 	"golang.org/x/tools/go/analysis/analysistest"
 )
@@ -13,7 +14,7 @@ func TestAnalyzer(t *testing.T) {
 		rules.NewLowercaseRule(),
 	}
 
-	a := New(ruleSet)
+	a := New(ruleSet, config.Config{})
 
 	analysistest.Run(
 		t,
@@ -29,6 +30,7 @@ func TestAnalyzer_PanicRule(t *testing.T) {
 		[]rules.Rule{
 			rules.PanicRule{},
 		},
+		config.Config{},
 	)
 
 	analysistest.Run(
@@ -41,7 +43,7 @@ func TestAnalyzer_PanicRule(t *testing.T) {
 
 func TestAnalyzer_NoRules(t *testing.T) {
 
-	a := New(nil)
+	a := New(nil, config.Config{})
 
 	analysistest.Run(
 		t,
