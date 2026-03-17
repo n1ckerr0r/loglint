@@ -21,9 +21,52 @@ jobs:
         with:
           go-version: "1.26.1"
 
-      - name: Veify Go instaallation
-        run: |
-          go version
-          go env
+      # Настройка проекта
+      - name: Cache Go modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: ${{ runner.os }}-go-{{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
       - name: Download dependencies
         run: go mod download
+
+      - name: Verify go.mod tidy
+        run: |
+          go mod tidy
+          git diff --exit-code
+
+      - name: Check formatting
+        run: |
+          if [ "$gofmt -l ." ]; then
+            echo "Go files not formatted"
+            gofmt -d .
+          fi
+
+      - name: Run Go Vet
+        run: go vet ./...
+
+      - name: Run Go Build
+        run: go build ./...
+
+      - name: Run Tests
+        run: go test -race ./...
+
+      # Настройка Утилиты
+      - name: Install golangci-lint
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh \
+          | sh -s -- -b $(go env GOPATH)/bin v1.59.1
+
+      - name: Build golangci-lint custom binary
+        run: |
+          golangci-lint custom
+
+      - name: Test custom golangci-list binary
+        run: |
+          chmod +x ./gcl-with-loglint
+          ./gcl-with-loglint run ./testdata
