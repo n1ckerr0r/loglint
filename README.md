@@ -50,7 +50,7 @@ golangci-lint custom
 
 ```bash
 chmod u+x ./gcl-with-loglint
-./gcl-with-loglint run ./gcl-with-loglint run ./testdata
+./gcl-with-loglint run ./testdata
 ```
 
 ## Тесты
