@@ -47,7 +47,7 @@ func TestDetectSlog_Simple(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			selector := &ast.SelectorExpr{
-				X: &ast.Ident{Name: tt.identName},
+				X:   &ast.Ident{Name: tt.identName},
 				Sel: &ast.Ident{Name: tt.level},
 			}
 

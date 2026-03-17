@@ -34,11 +34,11 @@ func New(conf any) (register.LinterPlugin, error) {
 		return nil, err
 	}
 	cfg := config.Config{
-		EnableLowercase:  s.CheckLowercase,
-		EnableEnglish:    s.CheckEnglish,
-		EnableSpecial:    s.CheckSpecialChars,
-		EnableSensitive:  s.CheckSensitive,
-		CaseSensitive:    s.SensitiveCase,
+		EnableLowercase:   s.CheckLowercase,
+		EnableEnglish:     s.CheckEnglish,
+		EnableSpecial:     s.CheckSpecialChars,
+		EnableSensitive:   s.CheckSensitive,
+		CaseSensitive:     s.SensitiveCase,
 		SensitiveKeywords: s.SensitiveKeywords,
 	}
 	return &Plugin{cfg: cfg}, nil

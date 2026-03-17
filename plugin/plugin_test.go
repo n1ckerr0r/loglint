@@ -22,8 +22,8 @@ func TestNew(t *testing.T) {
 	}
 
 	cfg := map[string]any{
-		"check-lowercase": true,
-		"check-english":   true,
+		"check-lowercase":    true,
+		"check-english":      true,
 		"sensitive-keywords": []string{"pass"},
 	}
 
