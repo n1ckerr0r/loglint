@@ -66,7 +66,9 @@ jobs:
         run: |
           golangci-lint custom
 
+      # Здесь линтер должен найти ошибки в коде
       - name: Test custom golangci-list binary
+        continue-on-error: true
         run: |
           chmod +x ./gcl-with-loglint
           ./gcl-with-loglint run ./testdata
