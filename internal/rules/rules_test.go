@@ -75,7 +75,7 @@ func TestSpecialCharsRule(t *testing.T) {
 		t.Errorf("должно быть nil, получил %v", err)
 	}
 
-	msg = log_message.LogMessage{Text: "hello, world! how are you?"}
+	msg = log_message.LogMessage{Text: "hello world how are you"}
 	if err, _ := rule.Check(msg); err != nil {
 		t.Errorf("должно быть nil, получил %v", err)
 	}
