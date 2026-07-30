@@ -2,73 +2,64 @@ name: CI
 
 on:
   push:
-    branches: [ develop, main ]
+    branches:
+      - main
+      - master
   pull_request:
-    branches: [ develop, main ]
-  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
-  build:
+  test:
+    name: Test
     runs-on: ubuntu-latest
-
     steps:
-
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v5
 
       - name: Setup Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
-          go-version: "1.26.1"
-
-      # Настройка проекта
-      - name: Cache Go modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/go/pkg/mod
-            ~/.cache/go-build
-          key: ${{ runner.os }}-go-{{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-
-      - name: Download dependencies
-        run: go mod download
-
-      - name: Verify go.mod tidy
-        run: |
-          go mod tidy
-          git diff --exit-code
+          go-version-file: go.mod
+          cache: true
 
       - name: Check formatting
         run: |
-          if [ "$gofmt -l ." ]; then
-            echo "Go files not formatted"
-            gofmt -d .
-          fi
+          go fmt ./...
+          git diff --exit-code
 
-      - name: Run Go Vet
+      - name: Check module files
+        run: |
+          go mod tidy
+          git diff --exit-code go.mod go.sum
+
+      - name: Vet
         run: go vet ./...
 
-      - name: Run Go Build
-        run: go build ./...
+      - name: Test
+        run: go test -race -coverprofile=coverage.out ./...
 
-      - name: Run Tests
-        run: go test -race ./...
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage.out
 
-      # Настройка Утилиты
-      - name: Install golangci-lint
-        run: |
-          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh \
-          | sh -s -- -b $(go env GOPATH)/bin v2.11.3
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
 
-      - name: Build golangci-lint custom binary
-        run: |
-          golangci-lint custom
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: true
 
-      # Здесь линтер должен найти ошибки в коде
-      - name: Test custom golangci-list binary
-        continue-on-error: true
-        run: |
-          chmod +x ./gcl-with-loglint
-          ./gcl-with-loglint run ./testdata
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: latest

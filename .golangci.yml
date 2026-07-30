@@ -1,20 +1,22 @@
 version: "2"
 
+run:
+  timeout: 5m
+  tests: true
+
 linters:
   enable:
-    - loglint
+    - errcheck
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
 
-  settings:
-    custom:
-      loglint:
-        type: module
-        settings:
-          check-lowercase: true
-          check-english: true
-          check-specialchars: true
-          check-sensitive: true
-          sensitive-case: false
-          sensitive-keywords:
-            - password
-            - token
-            - secret
+formatters:
+  enable:
+    - gofmt
+    - goimports
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
